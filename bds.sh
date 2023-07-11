@@ -14,7 +14,7 @@ install_bds() {
 
     # 解压 Ubuntu 镜像
     echo "正在解压 Ubuntu 镜像..."
-    proot --link2symlink tar -xvJf ubuntu-rootfs.tar.xz --exclude="dev"||;
+    proot --link2symlink tar -xvJf ubuntu-rootfs.tar.xz --exclude="dev"||:
     rm ubuntu-rootfs.tar.gz
 
     # 下载启动脚本并赋予执行权限
