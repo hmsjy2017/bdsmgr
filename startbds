@@ -1,0 +1,3 @@
+#!/bin/bash
+cd mc
+LD_LIBRARY_PATH=. box64 ./bedrock_server

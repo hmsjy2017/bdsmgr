@@ -22,7 +22,8 @@ install_bds() {
     cd ..
     wget https://raw.gitmirror.com/hmsjy2017/bdsmgr/main/start-ubuntu.sh
     chmod +x start-ubuntu.sh
-
+    wget https://raw.gitmirror.com/hmsjy2017/bdsmgr/main/startbds
+    chmod +x startbds
     echo "Ubuntu 容器已安装完成"
 
     # 在容器中下载并安装Minecraft基岩版
