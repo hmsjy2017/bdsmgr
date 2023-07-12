@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 install_bds() {
-    if [ ! -d "$HOME/BDS/ubuntu-rootfs" ]; then
+    if [ ! -d "$HOME/BDS" ]; then
         # 安装必要软件包
         pkg install proot wget jq -y
 
@@ -11,7 +11,7 @@ install_bds() {
 
         # 下载 Ubuntu 镜像
         echo "正在下载 Ubuntu 镜像..."
-        git clone https://jihulab.com/hmsjy2017/ubuntu-rootfs
+        git clone -q https://jihulab.com/hmsjy2017/ubuntu-rootfs.git
         cd ubuntu-rootfs
 
         # 解压 Ubuntu 镜像
@@ -21,9 +21,9 @@ install_bds() {
 
         # 下载启动脚本并赋予执行权限
         cd ..
-        wget https://raw.gitmirror.com/hmsjy2017/bdsmgr/main/start-ubuntu.sh
+        wget -q https://raw.gitmirror.com/hmsjy2017/bdsmgr/main/start-ubuntu.sh
         chmod +x start-ubuntu.sh
-        wget https://raw.gitmirror.com/hmsjy2017/bdsmgr/main/startbds -O $HOME/BDS/ubuntu-rootfs/usr/bin/startbds
+        wget -q https://raw.gitmirror.com/hmsjy2017/bdsmgr/main/startbds -O $HOME/BDS/ubuntu-rootfs/usr/bin/startbds
         chmod +x ./ubuntu-rootfs/usr/bin/startbds
         echo "Ubuntu 容器已安装完成"
 
@@ -35,8 +35,9 @@ install_bds() {
         echo "Linux BDS 最新版： [${LATEST_VERSION}]"
         DOWNLOAD_URL=`curl -s https://raw.gitmirror.com/Bedrock-OSS/BDS-Versions/main/linux/${LATEST_VERSION}.json | jq -r '.download_url'`
         echo "正在下载最新版 BDS 压缩包..."
-        wget ${DOWNLOAD_URL}
-        unzip bedrock-server-${LATEST_VERSION}.zip
+        wget -q ${DOWNLOAD_URL}
+        echo "正在解压..."
+        unzip -q bedrock-server-${LATEST_VERSION}.zip
         rm bedrock-server-${LATEST_VERSION}.zip
         chmod +x bedrock_server
 
@@ -48,8 +49,8 @@ install_bds() {
 }
 
 run_bds() {
-    if [ ! -d "$HOME/BDS/ubuntu-rootfs" ]; then
-        echo "请先安装 BDS。"
+    if [ ! -d "$HOME/BDS" ]; then
+        echo "检测到未安装 BDS，请先安装。"
     else
         echo "正在进入容器..."
         echo "请在容器中执行 startbds 命令启动 BDS，需要停止 BDS 时执行 stop 命令 。"
@@ -60,40 +61,45 @@ run_bds() {
 }
 
 update_bds() {
-    if [ ! -d "$HOME/BDS/ubuntu-rootfs" ]; then
-        echo "请先安装 BDS。"
+    if [ ! -d "$HOME/BDS" ]; then
+        echo "检测到未安装 BDS，请先安装。"
     else
         echo "正在备份游戏数据..."
         cd ~/BDS/ubuntu-rootfs/root/mc
-        tar -czvf ../bds-backup.tar.gz allowlist.json Dedicated_Server.txt permissions.json server.properties worlds/
+        tar -czf ../bds-backup.tar.gz allowlist.json Dedicated_Server.txt permissions.json server.properties worlds/
         echo "正在删除旧版 BDS..."
         rm -rf *
         LATEST_VERSION=`curl -s https://raw.gitmirror.com/Bedrock-OSS/BDS-Versions/main/versions.json | jq -r '.linux.stable'`
         echo "Linux BDS 最新版：[${LATEST_VERSION}]"
         DOWNLOAD_URL=`curl -s https://raw.gitmirror.com/Bedrock-OSS/BDS-Versions/main/linux/${LATEST_VERSION}.json | jq -r '.download_url'`
         echo "正在下载最新版 BDS 压缩包..."
-        wget ${DOWNLOAD_URL}
-        unzip bedrock-server-${LATEST_VERSION}.zip
+        wget -q ${DOWNLOAD_URL}
+        echo "正在解压..."
+        unzip -q bedrock-server-${LATEST_VERSION}.zip
         rm bedrock-server-${LATEST_VERSION}.zip
         chmod +x bedrock_server
         echo "正在恢复备份..."
-        tar -zxvf ../bds-backup.tar.gz -C .
+        tar -zxf ../bds-backup.tar.gz -C .
         echo "更新成功！"
     fi
     exit
 }
 
 uninstall_bds() {
-    read -p "你确定要卸载 BDS 吗？(y/n): " confirm
-    if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
-        # 删除 Ubuntu 根文件系统
-        rm -rf ~/BDS/ubuntu-rootfs
-        # 删除启动脚本
-        rm ~/BDS/start-ubuntu.sh
-        rm -rf ~/BDS
-        echo "BDS 已成功卸载。"
+    if [ ! -d "$HOME/BDS" ]; then
+        echo "检测到未安装 BDS，请先安装。"
     else
-        echo "取消卸载操作。"
+        read -p "你确定要卸载 BDS 吗？(y/n): " confirm
+        if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+            # 删除 Ubuntu 根文件系统
+            rm -rf ~/BDS/ubuntu-rootfs
+            # 删除启动脚本
+            rm ~/BDS/start-ubuntu.sh
+            rm -rf ~/BDS
+            echo "BDS 已成功卸载。"
+        else
+            echo "取消卸载操作。"
+        fi
     fi
     exit
 }
@@ -106,7 +112,7 @@ while true; do
     printf "https://github.com/hmsjy2017/bdsmgr\n\n"
     echo "请选择操作："
     echo "1. 安装 BDS"
-    echo "2. 运行 BDS"
+    echo "2. 启动 BDS"
     echo "3. 更新 BDS"
     echo "4. 卸载 BDS"
     echo "5. 退出脚本"
