@@ -1,7 +1,7 @@
 # bdsmgr
 Minecraft 基岩版服务端（BDS）管理脚本
 
-注意：此脚本仅适用于 Termux，不支持 Linux
+（适用于 Termux）
 
 ## 功能
 - 安装 BDS
