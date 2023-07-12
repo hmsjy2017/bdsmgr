@@ -2,8 +2,9 @@
 
 install_bds() {
     if [ ! -d "$HOME/BDS" ]; then
-        # 安装必要软件包
-        pkg install proot wget jq -y
+        # 安装依赖
+        echo "正在安装依赖..."
+        apt-get install proot wget git jq -y > /dev/null
 
         # 创建 BDS 文件夹
         cd ~
@@ -41,7 +42,8 @@ install_bds() {
         rm bedrock-server-${LATEST_VERSION}.zip
         chmod +x bedrock_server
 
-        echo "BDS 已在 Ubuntu 容器中安装完成。"
+        printf "BDS 已在 Ubuntu 容器中安装完成。\n"
+        printf "安装目录：$HOME/BDS/ubuntu-rootfs/mc\n"
     else
         echo "检测到已安装 BDS，退出"
     fi
@@ -108,7 +110,7 @@ uninstall_bds() {
 while true; do
     clear
     printf "\nMinecraft 基岩版服务端（BDS）管理脚本\n"
-    printf "（此脚本仅适用于 Termux）\n"
+    printf "（适用于 Termux）\n"
     printf "https://github.com/hmsjy2017/bdsmgr\n\n"
     echo "请选择操作："
     echo "1. 安装 BDS"
